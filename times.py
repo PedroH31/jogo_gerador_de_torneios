@@ -1,67 +1,81 @@
-numero_de_times = int(input('Digite o número de times no torneio: '))
-lista_de_times = []
-vitorias_por_time = {}
-numero_de_jogos = 0
+def get_number_of_teams():
+    while True:
+        number_of_teams = int(input('Type the number of teams in the tournament: '))
+        if number_of_teams >= 2:
+            break
 
-while numero_de_times < 2:
-    if numero_de_times < 2:
-        print('O número mínimo de times é 2, tente de novo.')
+    return number_of_teams
 
-    numero_de_times = int(input('Digite o número de times no torneio: '))
 
-numero_do_time = 1
+def get_team_names(num_teams):
+    team_names = []
+    while len(team_names) < num_teams:
+        team_name = input(f'Enter the name for team #{len(team_names) + 1}: ')
 
-while len(lista_de_times) < numero_de_times:
+        if len(team_name) < 2:
+            print('Team names must have at least 2 characters, try again.')
 
-    time = input(f'Digite o nome do time #{numero_do_time}: ')
-    if time.count(' ') > 1:
-        print('Nomes de time devem ter no máximo 2 palavras, tente de novo.')
+        elif team_name.count(' ') > 1:
+            print('Team names may have at most 2 words, try again.')
 
-    elif len(time) < 2:
-        print('Nomes de time devem ter pelo menos 2 caracteres, tente de novo.')
+        else:
+            team_names.append(team_name)
 
-    else:
-        lista_de_times.append(time)
-        numero_do_time += 1
+    return team_names
 
-while True:
-    numero_de_jogos = int(input('Digite o número de jogos a serem jogados por cada time: '))
-    if numero_de_jogos < len(lista_de_times) - 1:
-        print('Número inválido de jogos. Cada time deve jogar um contra o outro pelo menos uma vez, tente de novo.')
 
-    else:
+def get_number_of_games_played(num_teams):
+    while True:
+        num_games = int(input('Enter the number of games played by each team: '))
+        if num_games < num_teams - 1:
+            print('Invalid number of games. Each team plays each other at least once in the regular season, try again.')
+
+        else:
+            break
+
+    return num_games
+
+
+def get_number_of_wins(team_names, games_played):
+    number_of_wins = []
+    for name in team_names:
+        while True:
+            team_wins = int(input(f'Enter the number of wins Team {name} had: '))
+
+            if team_wins < 0:
+                print('The minimum number of wins is 0, try again.')
+
+            elif team_wins > games_played:
+                print(f'The maximum number of wins is {games_played}')
+
+            else:
+                number_of_wins.append((name, team_wins))
+                break
+
+    return sorted(number_of_wins, key=lambda wins: wins[1])
+
+
+num_teams = get_number_of_teams()
+team_names = get_team_names(num_teams)
+games_played = get_number_of_games_played(num_teams)
+number_of_wins = get_number_of_wins(team_names, games_played)
+
+print('Generating the games to be played in the first round of the tournament...')
+
+
+home = 0
+away = -1
+
+for game in number_of_wins:
+    home_team = number_of_wins[home][0]
+    away_team = number_of_wins[away][0]
+
+    print(f'Home: {home_team} VS Away: {away_team}')
+
+    home += 1
+    away -= 1
+
+    if home == len(number_of_wins) // 2:
         break
 
-indice = 0
-
-while len(vitorias_por_time) < len(lista_de_times):
-    time_na_lista = lista_de_times[indice]
-    numero_de_vitorias = int(input(f'Digite o número de vitórias do time {time_na_lista}: '))
-
-    if numero_de_vitorias < 0:
-        print('O número mínimo de vitórias é 0, tente de novo.')
-
-    elif numero_de_vitorias > numero_de_jogos:
-        print(f'O número de vitórias máximo é {numero_de_jogos}, tente de novo.')
-
-    else:
-        vitorias_por_time[time_na_lista] = numero_de_vitorias
-        indice += 1
-
-print('Gerando os jogos a serem jogados no primeiro round do torneio...')
-
-pareamento = []
-
-for time, vitorias in vitorias_por_time.items():
-    pareamento.append((time, vitorias))
-    sorted(pareamento, key=lambda vitoria: vitoria[1])
-
-casa = -1
-fora = 0
-for time in pareamento:
-    print(f'Casa: {pareamento[casa]} VS Fora: {pareamento[fora]}')
-    casa -= 1
-    fora += 1
-    if fora == len(pareamento) / 2:
-        break
 
